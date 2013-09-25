@@ -9,6 +9,8 @@ FIXTURE_PATH = File.join(ROOT_PATH, "fixtures")
 
 # Support
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+# Dummies
+Dir["#{File.dirname(__FILE__)}/dummies/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
 end

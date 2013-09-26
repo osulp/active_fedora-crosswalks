@@ -180,7 +180,7 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
           asset.xwalkMetadata.content = File.read(File.join(FIXTURE_PATH, 'fixture_xml.xml'))
           expect(asset.xwalkMetadata.name(0).family_name).to eq ["Horn"]
         end
-        it "should set the crosswalked field" do
+        xit "should set the crosswalked field" do
           expect(asset.descMetadata.title).to eq ["Horn", "Caesar"]
         end
       end

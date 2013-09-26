@@ -1,18 +1,7 @@
 module ActiveFedora
   module Crosswalks
     module Accessors
-      class GenericAccessor
-        attr_accessor :datastream, :field
-        def self.new(datastream, field)
-          if self.to_s.include?("GenericAccessor") && datastream.kind_of?(ActiveFedora::RelsExtDatastream)
-            return RelsExtAccessor.new(datastream, field)
-          end
-          super
-        end
-        def initialize(datastream, field)
-          @datastream = datastream
-          @field = field
-        end
+      class RelsExtAccessor < GenericAccessor
         def get_reader
           return datastream, field, nil
         end

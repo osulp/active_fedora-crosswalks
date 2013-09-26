@@ -42,7 +42,8 @@ module ActiveFedora
         object, method, expected_args = source_accessor.get_reader
         crosswalker = self
         object.define_singleton_method(method) do |*args|
-          if !expected_args || args == expected_args
+          puts "Expected Arguments in Reader: #{expected_args}"
+          if !expected_args || args[0..-2] == expected_args || (args.last.kind_of?(Hash) && args.last.has_key?(expected_args))
             crosswalker.source_accessor.set_value(crosswalker.target_accessor.get_value)
           end
           crosswalker.target_accessor.get_value
@@ -53,7 +54,8 @@ module ActiveFedora
         object, method, expected_args = source_accessor.get_writer
         crosswalker = self
         object.define_singleton_method(method) do |*args|
-          if !expected_args || args == expected_args
+          puts "Expected Arguments in Writer: #{expected_args}"
+          if !expected_args || args[0..-2] == expected_args || (args.last.kind_of?(Hash) && args.last.has_key?(expected_args))
             result = super(args.last)
             crosswalker.target_accessor.set_value(result)
             return result

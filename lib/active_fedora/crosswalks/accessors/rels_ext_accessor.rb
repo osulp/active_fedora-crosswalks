@@ -3,17 +3,20 @@ module ActiveFedora
     module Accessors
       class RelsExtAccessor < GenericAccessor
         def get_reader
-          return datastream, field, nil
+          raise "Crosswalking from Rels-Ext not supported"
         end
         def get_writer
-          return datastream, "#{self.field}=", nil
+          raise "Crosswalking from Rels-Ext not supported."
         end
         def get_value
-          FieldProxy.new(Array.wrap(datastream.send(field.to_s)), self, field)
+          FieldProxy.new(Array.wrap(datastream.model.relationships(field.to_sym)), self, field)
         end
         def set_value(*args)
-          value = args.last
-          datastream.send("#{field.to_s}=",value)
+          datastream.model.clear_relationship(field.to_sym)
+          value = Array.wrap(args.last)
+          value.each do |v|
+            datastream.model.add_relationship(field.to_sym, v)
+          end
         end
       end
     end

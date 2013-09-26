@@ -1,6 +1,7 @@
 require 'rspec/autorun'
 ENV['environment'] ||= 'test'
 # - RSpec adds ./lib to the $LOAD_PATH
+require 'active_fedora'
 require 'active_fedora/crosswalks'
 #Resque.inline = Rails.env.test?
 ROOT_PATH = File.dirname(__FILE__)

@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency 'jettywrapper'
+  spec.add_development_dependency 'pry'
 
   spec.add_dependency 'active-fedora'
   spec.add_dependency 'activesupport', '>= 3.2.0', '< 5.0'

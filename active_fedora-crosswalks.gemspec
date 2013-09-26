@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = ActiveFedora::Crosswalks::VERSION
   spec.authors       = ["Trey Terrell"]
   spec.email         = ["trey.terrell@oregonstate.edu"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.description   = %q{Enables metadata crosswalking between ActiveFedora datastreams.}
+  spec.summary       = %q{Enables metadata crosswalking between ActiveFedora datastreams.}
+  spec.homepage      = "https://github.com/osulp/active_fedora-crosswalks"
+  spec.license       = "Apache v2"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

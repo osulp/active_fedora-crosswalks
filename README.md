@@ -1,6 +1,6 @@
 # ActiveFedora::Crosswalks
 
-TODO: Write a gem description
+Enables metadata crosswalking between ActiveFedora datastreams.
 
 ## Installation
 
@@ -18,7 +18,45 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+In the datastreams you'd like to enable for crosswalking include ActiveFedora::Crosswalks::Crosswalkable
+Example:
+```ruby
+class ExampleRdfDatastream < ActiveFedora::NtriplesRDFDatastream
+  include ActiveFedora::Crosswalks::Crosswalkable
+end
+```
+
+### Example - Crosswalking between RDF Datastreams
+```ruby
+class Asset < ActiveFedora::Base
+  has_metadata :name => 'descMetadata', :type => ExampleRdfDatastream
+  has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+    ds.crosswalk :field => :title, :to => :other_title, :in => :descMetadata
+  end
+end
+```
+
+### Example - Crosswalking from Rels-EXT to RDF Datastreams
+```ruby
+class Asset < ActiveFedora::Base
+  has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+    ds.crosswalk :field => :set, :to => :is_member_of_collection, :in => "RELS-EXT"
+  end
+end
+```
+
+### Example - Deep crosswalking from OM Datastreams to RDF
+```ruby
+class Asset < ActiveFedora::Base
+  has_metadata :name => 'descMetadata', :type => DummyOmDatastream
+  has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+    ds.crosswalk :field => :name, :to => [:name, :family_name], :in => :descMetadata
+  end
+end
+```
+
+**NOTE**: Currently there is no support for defining datastreams other than RDF datastreams as crosswalk destinations.
+          Pull Requests Accepted.
 
 ## Contributing
 

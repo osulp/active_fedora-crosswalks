@@ -6,11 +6,9 @@ module ActiveFedora
         def self.new(datastream, field)
           if self.to_s.include?("GenericAccessor")
             if datastream.kind_of?(ActiveFedora::RelsExtDatastream)
-              puts "Returning a rels accessor"
               return RelsExtAccessor.new(datastream, field)
             end
             if datastream.kind_of?(ActiveFedora::OmDatastream)
-              puts "Returning an OM Accessor"
               return OmAccessor.new(datastream, field)
             end
           end

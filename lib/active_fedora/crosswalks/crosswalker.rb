@@ -31,7 +31,7 @@ module ActiveFedora
         datastream.crosswalk_fields << field
         create_reader
         create_writer
-        sync_values
+        sync_values unless parent.kind_of?(ActiveFedora::SolrDigitalObject)
       end
 
       def source_accessor

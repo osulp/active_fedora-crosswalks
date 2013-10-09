@@ -6,9 +6,11 @@ module ActiveFedora
         def self.new(datastream, field)
           if self.to_s.include?("GenericAccessor")
             if datastream.kind_of?(ActiveFedora::RelsExtDatastream)
+              puts "Returning a rels accessor"
               return RelsExtAccessor.new(datastream, field)
             end
             if datastream.kind_of?(ActiveFedora::OmDatastream)
+              puts "Returning an OM Accessor"
               return OmAccessor.new(datastream, field)
             end
           end
@@ -27,9 +29,24 @@ module ActiveFedora
         def get_value
           FieldProxy.new(Array.wrap(datastream.send(field.to_s)), self, field)
         end
+        def original_get_value
+          if datastream.respond_to?("unstubbed_#{self.field}")
+            FieldProxy.new(Array.wrap(datastream.send("unstubbed_#{self.field}")), self, field)
+          else
+            get_value
+          end
+        end
         def set_value(*args)
           value = args.last
           datastream.send("#{field.to_s}=",value)
+        end
+        def original_set_value(*args)
+          value = args.last
+          if datastream.respond_to?("unstubbed_#{self.field}=")
+            datastream.send("unstubbed_#{self.field}=",value)
+          else
+            set_value(value)
+          end
         end
       end
     end

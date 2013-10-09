@@ -18,6 +18,8 @@ module ActiveFedora
             datastream.model.add_relationship(field.to_sym, v)
           end
         end
+        alias_method :original_get_value, :get_value
+        alias_method :original_set_value, :set_value
       end
     end
   end

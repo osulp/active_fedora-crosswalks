@@ -15,6 +15,8 @@ module ActiveFedora
           value = Array.wrap(args.last)
           datastream.send(:update_indexed_attributes, {field => value})
         end
+        alias_method :original_get_value, :get_value
+        alias_method :original_set_value, :set_value
       end
     end
   end

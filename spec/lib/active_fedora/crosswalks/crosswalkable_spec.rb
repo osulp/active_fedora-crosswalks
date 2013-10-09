@@ -9,7 +9,7 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
   after(:each) do
     Object.send(:remove_const, :CrosswalkAsset)
   end
-  context "crosswalking RDF to RDF" do
+  describe "crosswalking RDF to RDF" do
     before(:each) do
       CrosswalkAsset.has_metadata :name => 'descMetadata', :type => ExampleRdfDatastream
       CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
@@ -71,7 +71,99 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
       end
     end
   end
-  context "crosswalking RDF to RELS-EXT" do
+  describe "transforms" do
+    context "when you pass a transform" do
+      context "but you don't pass a reverse transform" do
+        before(:each) do
+          CrosswalkAsset.has_metadata :name => 'descMetadata', :type => ExampleRdfDatastream
+          CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+            ds.crosswalk :field => :title, :to => :other_title, :in => :descMetadata, :transform => Proc.new{|x| "bla_#{x}"}
+          end
+        end
+        it "should raise an error when you try to initialize the object" do
+          expect{asset}.to raise_error
+        end
+      end
+      context "as well as a reverse transform (for RDF)" do
+        before(:each) do
+          CrosswalkAsset.has_metadata :name => 'descMetadata', :type => ExampleRdfDatastream
+          CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+            ds.crosswalk :field => :title, :to => :other_title, :in => :descMetadata, :transform => Proc.new{|x| "bla_#{x}"},
+                         :reverse_transform => Proc.new{|x| x.split("bla_").last}
+          end
+        end
+        context "when a field is set" do
+          context "on the source datastream" do
+            before(:each) do
+              asset.descMetadata.other_title = "bla"
+            end
+            it "should transform the value" do
+              expect(asset.xwalkMetadata.title).to eq ["bla_bla"]
+            end
+            it "should leave the source datastream correct" do
+              expect(asset.descMetadata.other_title).to eq ["bla"]
+            end
+          end
+          context "on the crosswalked datastream" do
+            before(:each) do
+              asset.xwalkMetadata.title = "bla_bla"
+            end
+            it "should reverse transform the value for the source datastream" do
+              expect(asset.descMetadata.other_title).to eq ["bla"]
+            end
+            it "should leave the crosswalk datastream correct" do
+              expect(asset.xwalkMetadata.title).to eq ["bla_bla"]
+            end
+          end
+        end
+      end
+      context "as well as a reverse transform (for Rels)" do
+        before(:each) do
+          CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
+            ds.crosswalk :field => :title, :to => :is_member_of_collection, :in => "RELS-EXT", :transform => Proc.new{|x| x.split("info:fedora/").last},
+                         :reverse_transform => Proc.new{|x| "info:fedora/#{x}" }
+          end
+        end
+        context "when a field exists prior to crosswalking (previous data in graph)" do
+          before(:each) do
+            asset.xwalkMetadata.set_value(asset.xwalkMetadata.rdf_subject, :title, "test:testing")
+          end
+          it "should maintain that value" do
+            expect(asset.xwalkMetadata.title).to eq ["test:testing"]
+          end
+          it "should perform the transform to rels" do
+            asset.xwalkMetadata.title # Have to call this to perform the crosswalk right now. Calls sync_values.
+            expect(asset.relationships(:is_member_of_collection)).to eq ["info:fedora/test:testing"]
+          end
+        end
+        context "when a field is set" do
+          context "on the source datastream" do
+            before(:each) do
+              asset.add_relationship(:is_member_of_collection, "info:fedora/test:test")
+            end
+            it "should transform the value" do
+              expect(asset.xwalkMetadata.title).to eq ["test:test"]
+            end
+            it "should leave the source datastream correct" do
+              expect(asset.relationships(:is_member_of_collection)).to eq ["info:fedora/test:test"]
+            end
+          end
+          context "on the crosswalked datastream" do
+            before(:each) do
+              asset.xwalkMetadata.title = "test:test"
+            end
+            it "should reverse transform the value for the source datastream" do
+              expect(asset.relationships(:is_member_of_collection)).to eq ["info:fedora/test:test"]
+            end
+            it "should leave the crosswalk datastream correct" do
+              expect(asset.xwalkMetadata.title).to eq ["test:test"]
+            end
+          end
+        end
+      end
+    end
+  end
+  describe "crosswalking RDF to RELS-EXT" do
     before(:each) do
       CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
         ds.crosswalk :field => :title, :to => :is_member_of_collection, :in => "RELS-EXT"
@@ -122,7 +214,7 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
       end
     end
   end
-  context "crosswalking RDF to OM" do
+  describe "crosswalking RDF to OM" do
     before(:each) do
       CrosswalkAsset.has_metadata :name => 'descMetadata', :type => DummyOmDatastream
       CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => ExampleRdfDatastream do |ds|
@@ -162,12 +254,12 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
           asset.xwalkMetadata.title << "test"
         end
         it "should add the metadata to the source field" do
-          expect(asset.descMetadata.name.family_name).to eq ["Horn", "test", "Caesar"]
+          expect(asset.descMetadata.name.family_name).to eq ["Horn", "Caesar", "test"]
         end
       end
     end
   end
-  context "crosswalking OM to RDF" do
+  describe "crosswalking OM to RDF" do
     before(:each) do
       CrosswalkAsset.has_metadata :name => 'descMetadata', :type => ExampleRdfDatastream
       CrosswalkAsset.has_metadata :name => 'xwalkMetadata', :type => DummyOmDatastream do |ds|

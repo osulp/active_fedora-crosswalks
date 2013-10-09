@@ -66,6 +66,7 @@ module ActiveFedora
       def create_reader
         object, method, expected_args = source_accessor.get_reader
         crosswalker = self
+        return if object.respond_to?("unstubbed_#{method}".to_sym)
         object.singleton_class.class_eval do
           alias_method "unstubbed_#{method}".to_sym, method.to_sym
         end
@@ -78,6 +79,7 @@ module ActiveFedora
       def create_writer
         object, method, expected_args = source_accessor.get_writer
         crosswalker = self
+        return if object.respond_to?("unstubbed_#{method}".to_sym)
         object.singleton_class.class_eval do
           alias_method "unstubbed_#{method}".to_sym, method.to_sym
         end

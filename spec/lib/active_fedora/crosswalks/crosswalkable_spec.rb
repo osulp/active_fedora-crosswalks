@@ -16,6 +16,9 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
         ds.crosswalk :field => :title, :to => :other_title, :in => :descMetadata
       end
     end
+    it "should be able to reload" do
+      expect {asset.load_datastreams}.not_to raise_error
+    end
     context "when a field is set" do
       context "on the source datastream" do
         before(:each) do

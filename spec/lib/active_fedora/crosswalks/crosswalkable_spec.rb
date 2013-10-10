@@ -19,6 +19,30 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
     it "should be able to reload" do
       expect {asset.load_datastreams}.not_to raise_error
     end
+    context "when content is set directly" do
+      context "on the crosswalk datastream" do
+        before(:each) do
+          asset.xwalkMetadata.title = "Test"
+          old_content = asset.xwalkMetadata.content
+          asset.xwalkMetadata.title = "Testing"
+          asset.xwalkMetadata.content = old_content
+        end
+        it "should set the source datastream" do
+          expect(asset.descMetadata.other_title).to eq ["Test"]
+        end
+      end
+      context "on the source datastream" do
+        before(:each) do
+          asset.descMetadata.other_title = "Test"
+          old_content = asset.descMetadata.content
+          asset.descMetadata.other_title = "Testing"
+          asset.descMetadata.content = old_content
+        end
+        it "should set the crosswalked datastream" do
+          expect(asset.xwalkMetadata.title).to eq ["Test"]
+        end
+      end
+    end
     context "when a field is set" do
       context "on the source datastream" do
         before(:each) do

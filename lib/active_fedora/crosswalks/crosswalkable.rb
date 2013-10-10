@@ -4,9 +4,16 @@ module ActiveFedora
       # Override content so when it's called it performs crosswalks first.
       def content
         crosswalkers.each do |crosswalker|
-          crosswalker.source_accessor.get_value
+          crosswalker.sync_values
         end
         super
+      end
+      def content=(*args)
+        result = super(*args)
+        crosswalkers.each do |crosswalker|
+          crosswalker.sync_values(:force_target => true)
+        end
+        return result
       end
       def crosswalk_fields
         @crosswalk_fields ||= []

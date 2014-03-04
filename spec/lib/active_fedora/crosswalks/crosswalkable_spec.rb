@@ -22,6 +22,7 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
     context "when content is set directly" do
       context "on the crosswalk datastream" do
         before(:each) do
+          asset.save
           asset.xwalkMetadata.title = "Test"
           old_content = asset.xwalkMetadata.content
           asset.xwalkMetadata.title = "Testing"
@@ -33,9 +34,11 @@ describe ActiveFedora::Crosswalks::Crosswalkable do
       end
       context "on the source datastream" do
         before(:each) do
+          asset.save
           asset.descMetadata.other_title = "Test"
           old_content = asset.descMetadata.content
           asset.descMetadata.other_title = "Testing"
+          asset.descMetadata.content = old_content
           asset.descMetadata.content = old_content
         end
         it "should set the crosswalked datastream" do
